@@ -3,48 +3,78 @@ import './App.css';
 
 function App() {
   const [books, setBooks] = useState([]);
-  
-  // 1. PASTE YOUR CSV LINK HERE
-  const csvUrl = "YOUR_GOOGLE_SHEETS_CSV_LINK_HERE";
+  const [searchTerm, setSearchTerm] = useState("");
 
-  // 2. The helper function to fix Google Drive Image Links
+  // 1. YOUR CSV LINK GOES HERE
+  const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTqehdZn2NuyOCbL5W38DFc5sWk2ba0HnJnZ0nQZ1GJIjvleYapYHnpDvaHbadpFkOSDew6lBGkOU6F/pub?output=csv";
+
+  // 2. THE IMAGE HELPER (Must be inside the App function)
   const getImageUrl = (driveLink) => {
-    if (!driveLink || !driveLink.includes('id=')) {
-      // If it's a direct link or empty, return as is
-      return driveLink;
-    }
-    const fileId = driveLink.split('id=')[1];
-    return `https://lh3.googleusercontent.com/d/${fileId}=s400`;
-  };
+  if (!driveLink) return "";
+  const regex = /(?:id=|\/d\/|file\/d\/)([\w-]{25,})/;
+  const match = driveLink.match(regex);
+  if (match && match[1]) {
+    // This bypasses the typical Drive security screen
+    return `https://lh3.googleusercontent.com/d/${match[1]}`;
+  }
+  return driveLink;
+};
 
   useEffect(() => {
     fetch(csvUrl)
       .then(res => res.text())
       .then(text => {
-        const rows = text.split('\n').slice(1); 
-        const data = rows.map(row => {
-          const cols = row.split(',');
-          return {
-            title: cols[0],
-            author: cols[1],
-            cover: cols[2] 
-          };
-        });
+        // If the link still gives us a website instead of data, this stops the error
+        if (text.trim().startsWith('<')) {
+          console.error("The link provided is still returning a webpage, not a CSV.");
+          return;
+        }
+
+        const rows = text.split('\n').filter(row => row.trim() !== ""); 
+        const data = rows.slice(1).map(row => {
+  const cols = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+  
+  // This automatically finds the column that contains a Drive link
+  const driveLink = cols.find(c => c && c.includes('drive.google.com')) || "";
+
+  return { 
+    title: (cols[0] || "").replace(/"/g, "").trim(), 
+    author: (cols[1] || "").replace(/"/g, "").trim(), 
+    cover: driveLink.trim() 
+  };
+});
         setBooks(data);
-      });
+      })
+      .catch(err => console.error("Error fetching data:", err));
   }, [csvUrl]);
+
+  const filteredBooks = books.filter(book => 
+    book.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    book.author.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <div className="library-container">
       <header className="library-header">
         <h1>My Digital Bookshelf</h1>
-        <p>Total Books: {books.length}</p>
+        
+        <div className="search-container">
+          <input 
+            type="text" 
+            placeholder="Search by title or author..." 
+            className="search-input"
+            onChange={(e) => setSearchTerm(e.target.value)} 
+          />
+        </div>
+        
+        <p>Showing {filteredBooks.length} of {books.length} books</p>
       </header>
 
       <main className="book-grid">
-        {books.map((book, index) => (
+        {filteredBooks.map((book, index) => (
           <div key={index} className="book-card">
             <div className="book-cover-wrapper">
+              {/* This is the line that was crashing! */}
               <img src={getImageUrl(book.cover)} alt={book.title} />
             </div>
             <div className="book-info">
