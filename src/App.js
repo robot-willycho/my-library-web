@@ -95,14 +95,21 @@ function App() {
     fetch(csvUrl).then(res => res.text()).then(text => {
       const rows = text.split('\n').filter(row => row.trim() !== "");
       const data = rows.slice(1).map(row => {
-        const cols = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-        return {
-          title: (cols[0] || "").replace(/"/g, "").trim(),
-          author: (cols[1] || "").replace(/"/g, "").trim(),
-          category: (cols[12] || "Uncategorized").trim(), 
-          cover: (cols[10] || "").trim()
-        };
-      });
+          // Split the row by commas (handling quotes)
+          const cols = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+          
+          // 1. SMART SEARCH: Find the column that looks like a Google Drive link
+          const driveLink = cols.find(c => c && c.includes('drive.google.com')) || "";
+
+          return {
+            title: (cols[0] || "").replace(/"/g, "").trim(),
+            author: (cols[1] || "").replace(/"/g, "").trim(),
+            // 2. USE COLUMN M (Index 12) for Category
+            category: (cols[12] || "Uncategorized").trim(), 
+            // 3. USE THE FOUND LINK for the cover
+            cover: driveLink.trim()
+          };
+        });
       setBooks(data);
     });
   }, []);
