@@ -31,15 +31,6 @@
   margin-top: 30px;
 }
 
-.book-card {
-  border: 1px solid #eee;
-  padding: 15px;
-  border-radius: 10px;
-  text-align: center;
-  background: white;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-}
-
 .book-cover-wrapper img {
   max-width: 100%;
   height: 250px;
@@ -48,13 +39,38 @@
 }
 
 .book-info h3 {
-  font-size: 1rem;
+  font-size: 0.95rem; /* Slightly smaller to help with long Chinese characters */
   margin: 10px 0 5px 0;
   color: #333;
-  /* This prevents long titles from breaking the layout */
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  height: 2.4em; 
+  line-height: 1.4;
+  
+  /* REMOVE the line-clamp lines from before */
+  display: block; 
+  overflow: visible; 
+  height: auto; /* Let the card expand naturally */
+  min-height: 3em; /* Ensures cards stay somewhat aligned */
+}
+
+.book-card {
+  /* ... existing styles ... */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* Keeps the author at the bottom */
+}
+
+.qr-section {
+  text-align: center;
+  margin: 20px 0;
+}
+
+.qr-section img {
+  border: 4px solid white;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  border-radius: 8px;
+}
+
+.qr-section p {
+  font-size: 0.7rem;
+  color: #888;
+  margin-top: 5px;
 }

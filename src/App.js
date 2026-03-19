@@ -68,6 +68,15 @@ function App() {
         </div>
         
         <p>Showing {filteredBooks.length} of {books.length} books</p>
+
+        {/* Change 'YOUR_VERCEL_URL' to your actual live link */}
+    <div className="qr-section">
+      <img 
+        src={`https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=https://your-vercel-url.vercel.app`} 
+        alt="Library QR Code" 
+      />
+      <p>Scan to view on mobile</p>
+    </div>
       </header>
 
       <main className="book-grid">
