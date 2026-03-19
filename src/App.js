@@ -1,89 +1,78 @@
 import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Link, useParams } from 'react-router-dom';
 import './App.css';
 
-function App() {
-  const [books, setBooks] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
-
-  // 1. YOUR CSV LINK GOES HERE
-  const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTqehdZn2NuyOCbL5W38DFc5sWk2ba0HnJnZ0nQZ1GJIjvleYapYHnpDvaHbadpFkOSDew6lBGkOU6F/pub?output=csv";
-
-  // 2. THE IMAGE HELPER (Must be inside the App function)
-  const getImageUrl = (driveLink) => {
+// --- SHARED UTILITY ---
+const getImageUrl = (driveLink) => {
   if (!driveLink) return "";
   const regex = /(?:id=|\/d\/|file\/d\/)([\w-]{25,})/;
   const match = driveLink.match(regex);
-  if (match && match[1]) {
-    // This bypasses the typical Drive security screen
-    return `https://lh3.googleusercontent.com/d/${match[1]}`;
-  }
-  return driveLink;
+  return match ? `https://docs.google.com/uc?export=view&id=${match[1]}` : driveLink;
 };
 
-  useEffect(() => {
-    fetch(csvUrl)
-      .then(res => res.text())
-      .then(text => {
-        // If the link still gives us a website instead of data, this stops the error
-        if (text.trim().startsWith('<')) {
-          console.error("The link provided is still returning a webpage, not a CSV.");
-          return;
-        }
-
-        const rows = text.split('\n').filter(row => row.trim() !== ""); 
-        const data = rows.slice(1).map(row => {
-  const cols = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-  
-  // This automatically finds the column that contains a Drive link
-  const driveLink = cols.find(c => c && c.includes('drive.google.com')) || "";
-
-  return { 
-    title: (cols[0] || "").replace(/"/g, "").trim(), 
-    author: (cols[1] || "").replace(/"/g, "").trim(), 
-    cover: driveLink.trim() 
+// --- COMPONENT 1: THE CATEGORY SHELF (Home) ---
+function Home({ books }) {
+  // This maps your numbers to specific icons
+  const categoryIcons = {
+    "100": "🧠", // Philosophy & Psychology
+    "600": "⚙️", // Technology
+    "700": "🎨", // Arts (Where Siumaipedia lives!)
+    "000": "📋", // General Works
+    "default": "📚"
   };
-});
-        setBooks(data);
-      })
-      .catch(err => console.error("Error fetching data:", err));
-  }, [csvUrl]);
 
-  const filteredBooks = books.filter(book => 
-    book.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    book.author.toLowerCase().includes(searchTerm.toLowerCase())
+  // Get unique categories and sort them numerically
+  const categories = [...new Set(books.map(b => b.category).filter(c => c))].sort();
+
+  return (
+    <div className="home-container">
+      <header className="home-header">
+        <h1>My Digital Library</h1>
+        <p>Select a section to browse</p>
+      </header>
+      
+      <div className="category-grid">
+        {categories.map(cat => (
+          <Link to={`/category/${cat}`} key={cat} className="category-card">
+            <div className="category-icon">
+              {/* This looks up the icon based on the first 3 digits of your category */}
+              {categoryIcons[cat.substring(0, 3)] || categoryIcons["default"]}
+            </div>
+            <h3>{cat}</h3>
+            <p className="book-count">{books.filter(b => b.category === cat).length} Books</p>
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// --- COMPONENT 2: THE BOOK LIST PAGE ---
+function CategoryPage({ books }) {
+  const { catName } = useParams();
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const filtered = books.filter(b => 
+    b.category === catName && 
+    (b.title.toLowerCase().includes(searchTerm.toLowerCase()) || b.author.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   return (
     <div className="library-container">
       <header className="library-header">
-        <h1>My Digital Bookshelf</h1>
-        
-        <div className="search-container">
-          <input 
-            type="text" 
-            placeholder="Search by title or author..." 
-            className="search-input"
-            onChange={(e) => setSearchTerm(e.target.value)} 
-          />
-        </div>
-        
-        <p>Showing {filteredBooks.length} of {books.length} books</p>
-
-        {/* Change 'YOUR_VERCEL_URL' to your actual live link */}
-    <div className="qr-section">
-      <img 
-        src={`https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=https://my-library-web.vercel.app/`} 
-        alt="Library QR Code" 
-      />
-      <p>Scan to view on mobile</p>
-    </div>
+        <Link to="/" className="back-button">← Back to Sections</Link>
+        <h1>{catName}</h1>
+        <input 
+          type="text" 
+          placeholder="Search in this section..." 
+          className="search-input"
+          onChange={(e) => setSearchTerm(e.target.value)} 
+        />
       </header>
-
       <main className="book-grid">
-        {filteredBooks.map((book, index) => (
+        {filtered.map((book, index) => (
           <div key={index} className="book-card">
             <div className="book-cover-wrapper">
-              {/* This is the line that was crashing! */}
               <img src={getImageUrl(book.cover)} alt={book.title} />
             </div>
             <div className="book-info">
@@ -94,6 +83,37 @@ function App() {
         ))}
       </main>
     </div>
+  );
+}
+
+// --- MAIN APP ---
+function App() {
+  const [books, setBooks] = useState([]);
+  const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTqehdZn2NuyOCbL5W38DFc5sWk2ba0HnJnZ0nQZ1GJIjvleYapYHnpDvaHbadpFkOSDew6lBGkOU6F/pub?output=csv";
+
+  useEffect(() => {
+    fetch(csvUrl).then(res => res.text()).then(text => {
+      const rows = text.split('\n').filter(row => row.trim() !== "");
+      const data = rows.slice(1).map(row => {
+        const cols = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+        return {
+          title: (cols[0] || "").replace(/"/g, "").trim(),
+          author: (cols[1] || "").replace(/"/g, "").trim(),
+          category: (cols[12] || "Uncategorized").trim(), 
+          cover: (cols[10] || "").trim()
+        };
+      });
+      setBooks(data);
+    });
+  }, []);
+
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<Home books={books} />} />
+        <Route path="/category/:catName" element={<CategoryPage books={books} />} />
+      </Routes>
+    </Router>
   );
 }
 
