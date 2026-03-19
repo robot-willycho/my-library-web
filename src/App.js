@@ -7,7 +7,10 @@ const getImageUrl = (driveLink) => {
   if (!driveLink) return "";
   const regex = /(?:id=|\/d\/|file\/d\/)([\w-]{25,})/;
   const match = driveLink.match(regex);
-  return match ? `https://docs.google.com/uc?export=view&id=${match[1]}` : driveLink;
+  if (match && match[1]) {
+    return `https://docs.google.com/uc?export=view&id=${match[1]}`;
+  }
+  return driveLink;
 };
 
 // --- COMPONENT 1: THE CATEGORY SHELF (Home) ---
@@ -91,27 +94,32 @@ function App() {
   const [books, setBooks] = useState([]);
   const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTqehdZn2NuyOCbL5W38DFc5sWk2ba0HnJnZ0nQZ1GJIjvleYapYHnpDvaHbadpFkOSDew6lBGkOU6F/pub?output=csv";
 
-  useEffect(() => {
-    fetch(csvUrl).then(res => res.text()).then(text => {
-      const rows = text.split('\n').filter(row => row.trim() !== "");
-      const data = rows.slice(1).map(row => {
-          // Split the row by commas (handling quotes)
+ useEffect(() => {
+    fetch(csvUrl)
+      .then(res => res.text())
+      .then(text => {
+        const rows = text.split('\n').filter(row => row.trim() !== "");
+        
+        const data = rows.slice(1).map((row, rowIndex) => {
+          // This regex is the most robust way to split CSV columns
           const cols = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-          
-          // 1. SMART SEARCH: Find the column that looks like a Google Drive link
+
+          // DEBUG: This will show you exactly what's in your columns for the first 3 books
+          if (rowIndex < 3) console.log(`Row ${rowIndex} columns:`, cols);
+
+          // Find the column that looks like a Drive link
           const driveLink = cols.find(c => c && c.includes('drive.google.com')) || "";
 
           return {
             title: (cols[0] || "").replace(/"/g, "").trim(),
             author: (cols[1] || "").replace(/"/g, "").trim(),
-            // 2. USE COLUMN M (Index 12) for Category
-            category: (cols[12] || "Uncategorized").trim(), 
-            // 3. USE THE FOUND LINK for the cover
-            cover: driveLink.trim()
+            // We'll use Index 12 for Category M, but fall back to "Uncategorized"
+            category: (cols[12] || "Uncategorized").replace(/"/g, "").trim(),
+            cover: driveLink.replace(/"/g, "").trim() // Remove any stray quotes
           };
         });
-      setBooks(data);
-    });
+        setBooks(data);
+      });
   }, []);
 
   return (
