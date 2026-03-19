@@ -5,8 +5,8 @@ import './App.css';
 // --- SHARED UTILITY ---
 const getImageUrl = (driveLink) => {
   if (!driveLink) return "";
-  const regex = /(?:id=|\/d\/|file\/d\/)([\w-]{25,})/;
-  const match = driveLink.match(regex);
+  // This regex is specifically designed to extract the ID from the format in your console
+  const match = driveLink.match(/\/d\/([\w-]+)/);
   if (match && match[1]) {
     return `https://docs.google.com/uc?export=view&id=${match[1]}`;
   }
@@ -99,25 +99,24 @@ function App() {
       .then(res => res.text())
       .then(text => {
         const rows = text.split('\n').filter(row => row.trim() !== "");
-        
         const data = rows.slice(1).map((row, rowIndex) => {
-          // This regex is the most robust way to split CSV columns
-          const cols = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+            // 1. Split columns
+            const cols = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
 
-          // DEBUG: This will show you exactly what's in your columns for the first 3 books
-          if (rowIndex < 3) console.log(`Row ${rowIndex} columns:`, cols);
+            // 2. Find the Drive link
+            let rawLink = cols.find(c => c && c.includes('drive.google.com')) || "";
+            
+            // 3. THE CLEANUP: Remove quotes, spaces, and those hidden \r characters
+            const cleanLink = rawLink.replace(/[平" \r\n]/g, "").trim();
 
-          // Find the column that looks like a Drive link
-          const driveLink = cols.find(c => c && c.includes('drive.google.com')) || "";
-
-          return {
-            title: (cols[0] || "").replace(/"/g, "").trim(),
-            author: (cols[1] || "").replace(/"/g, "").trim(),
-            // We'll use Index 12 for Category M, but fall back to "Uncategorized"
-            category: (cols[12] || "Uncategorized").replace(/"/g, "").trim(),
-            cover: driveLink.replace(/"/g, "").trim() // Remove any stray quotes
-          };
-        });
+            return {
+              title: (cols[0] || "").replace(/"/g, "").trim(),
+              author: (cols[1] || "").replace(/"/g, "").trim(),
+              // Use Index 12 for your Category Code
+              category: (cols[12] || "Uncategorized").replace(/[平" \r\n]/g, "").trim(),
+              cover: cleanLink
+            };
+          });
         setBooks(data);
       });
   }, []);
