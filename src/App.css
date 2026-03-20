@@ -58,21 +58,26 @@
   justify-content: space-between; /* Keeps the author at the bottom */
 }
 
-.qr-section {
+..qr-section {
   text-align: center;
-  margin: 20px 0;
+  background: white;
+  padding: 10px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
 }
 
 .qr-section img {
-  border: 4px solid white;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  border-radius: 8px;
+  width: 80px;
+  height: 80px;
+  display: block;
+  margin: 0 auto;
 }
 
 .qr-section p {
-  font-size: 0.7rem;
-  color: #888;
+  font-size: 0.65rem;
+  color: #666;
   margin-top: 5px;
+  font-weight: bold;
 }
 
 .category-grid {
@@ -130,4 +135,12 @@
   font-size: 2.5rem;
   color: #2c3e50;
   margin-bottom: 10px;
+}
+
+.global-header {
+  display: flex;
+  justify-content: center;
+  padding: 20px 0;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #eee;
 }

@@ -126,10 +126,23 @@ function App() {
 
   return (
     <Router>
-      <Routes>
-        <Route path="/" element={<Home books={books} />} />
-        <Route path="/category/:catName" element={<CategoryPage books={books} />} />
-      </Routes>
+      <div className="app-container">
+        {/* This QR section stays at the top of the entire app */}
+        <div className="global-header">
+          <div className="qr-section">
+            <img 
+              src={`https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=https://my-library-web.vercel.app`} 
+              alt="Library QR Code" 
+            />
+            <p>Scan to browse on mobile</p>
+          </div>
+        </div>
+
+        <Routes>
+          <Route path="/" element={<Home books={books} />} />
+          <Route path="/category/:catName" element={<CategoryPage books={books} />} />
+        </Routes>
+      </div>
     </Router>
   );
 }
