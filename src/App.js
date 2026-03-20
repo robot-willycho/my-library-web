@@ -5,11 +5,16 @@ import './App.css';
 // --- SHARED UTILITY ---
 const getImageUrl = (driveLink) => {
   if (!driveLink) return "";
-  // This regex is specifically designed to extract the ID from the format in your console
-  const match = driveLink.match(/\/d\/([\w-]+)/);
+  
+  // Extract the ID from any Google Drive link format
+  const match = driveLink.match(/(?:id=|\/d\/)([\w-]+)/);
+  
   if (match && match[1]) {
-    return `https://docs.google.com/uc?export=view&id=${match[1]}`;
+    const fileId = match[1];
+    // This 'lh3' link is the 'Web-Friendly' version that avoids CORB blocks
+    return `https://lh3.googleusercontent.com/d/${fileId}=s400`;
   }
+  
   return driveLink;
 };
 
@@ -99,24 +104,22 @@ function App() {
       .then(res => res.text())
       .then(text => {
         const rows = text.split('\n').filter(row => row.trim() !== "");
-        const data = rows.slice(1).map((row, rowIndex) => {
-            // 1. Split columns
-            const cols = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+        const data = rows.slice(1).map((row) => {
+          const cols = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+          
+          // Find the column that contains the drive link
+          let rawLink = cols.find(c => c && c.includes('drive.google.com')) || "";
 
-            // 2. Find the Drive link
-            let rawLink = cols.find(c => c && c.includes('drive.google.com')) || "";
-            
-            // 3. THE CLEANUP: Remove quotes, spaces, and those hidden \r characters
-            const cleanLink = rawLink.replace(/[平" \r\n]/g, "").trim();
+          // Helper to remove quotes, hidden returns, and extra spaces
+          const clean = (str) => str ? str.replace(/["\r\n]/g, "").trim() : "";
 
-            return {
-              title: (cols[0] || "").replace(/"/g, "").trim(),
-              author: (cols[1] || "").replace(/"/g, "").trim(),
-              // Use Index 12 for your Category Code
-              category: (cols[12] || "Uncategorized").replace(/[平" \r\n]/g, "").trim(),
-              cover: cleanLink
-            };
-          });
+          return {
+            title: clean(cols[0]),
+            author: clean(cols[1]),
+            category: clean(cols[12] || "Uncategorized"), // Index 12 for Category M
+            cover: clean(rawLink)
+          };
+        });
         setBooks(data);
       });
   }, []);
