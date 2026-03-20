@@ -5,7 +5,7 @@ import './App.css';
 // --- SHARED UTILITY ---
 const getImageUrl = (driveLink) => {
   if (!driveLink) return "";
-  
+
   // Extract the ID from any Google Drive link format
   const match = driveLink.match(/(?:id=|\/d\/)([\w-]+)/);
   
@@ -18,17 +18,27 @@ const getImageUrl = (driveLink) => {
   return driveLink;
 };
 
+// This maps your numbers to specific icons
+  const getCategoryIcon = (catCode) => {
+  // Take the first character (e.g., "5" from "500")
+  const prefix = catCode.substring(0, 1);
+  const icons = {
+    "1": "🧠", // 100s
+    "2": "⛪", // 200s
+    "3": "👥", // 300s
+    "4": "🗣️", // 400s
+    "5": "🔬", // 500s
+    "6": "⚙️", // 600s
+    "7": "🎨", // 700s
+    "8": "📚", // 800s
+    "9": "🗺️", // 900s
+    "0": "📋", // 000s
+  };
+  return icons[prefix] || "📖";
+};
+
 // --- COMPONENT 1: THE CATEGORY SHELF (Home) ---
 function Home({ books }) {
-  // This maps your numbers to specific icons
-  const categoryIcons = {
-    "100": "🧠", // Philosophy & Psychology
-    "600": "⚙️", // Technology
-    "700": "🎨", // Arts (Where Siumaipedia lives!)
-    "000": "📋", // General Works
-    "default": "📚"
-  };
-
   // Get unique categories and sort them numerically
   const categories = [...new Set(books.map(b => b.category).filter(c => c))].sort();
 
@@ -44,7 +54,7 @@ function Home({ books }) {
           <Link to={`/category/${cat}`} key={cat} className="category-card">
             <div className="category-icon">
               {/* This looks up the icon based on the first 3 digits of your category */}
-              {categoryIcons[cat.substring(0, 3)] || categoryIcons["default"]}
+              {getCategoryIcon(cat)}
             </div>
             <h3>{cat}</h3>
             <p className="book-count">{books.filter(b => b.category === cat).length} Books</p>
@@ -59,10 +69,12 @@ function Home({ books }) {
 function CategoryPage({ books }) {
   const { catName } = useParams();
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedBook, setSelectedBook] = useState(null); // Tracks the clicked book
 
   const filtered = books.filter(b => 
     b.category === catName && 
-    (b.title.toLowerCase().includes(searchTerm.toLowerCase()) || b.author.toLowerCase().includes(searchTerm.toLowerCase()))
+    (b.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
+     b.author.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   return (
@@ -70,16 +82,18 @@ function CategoryPage({ books }) {
       <header className="library-header">
         <Link to="/" className="back-button">← Back to Sections</Link>
         <h1>{catName}</h1>
-        <input 
-          type="text" 
-          placeholder="Search in this section..." 
+        <input
+          type="text"
+          placeholder="Search in this section..."
           className="search-input"
-          onChange={(e) => setSearchTerm(e.target.value)} 
+          onChange={(e) => setSearchTerm(e.target.value)}
         />
       </header>
+
       <main className="book-grid">
         {filtered.map((book, index) => (
-          <div key={index} className="book-card">
+          // Notice the onClick here!
+          <div key={index} className="book-card" onClick={() => setSelectedBook(book)}>
             <div className="book-cover-wrapper">
               <img src={getImageUrl(book.cover)} alt={book.title} />
             </div>
@@ -90,6 +104,44 @@ function CategoryPage({ books }) {
           </div>
         ))}
       </main>
+
+      {/* --- THE POP-UP MODAL --- */}
+      {selectedBook && (
+        <div className="modal-overlay" onClick={() => setSelectedBook(null)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <button className="close-button" onClick={() => setSelectedBook(null)}>×</button>
+            
+            <div className="modal-body">
+              <div className="modal-image">
+                <img src={getImageUrl(selectedBook.cover)} alt={selectedBook.title} />
+              </div>
+              
+              <div className="modal-details">
+                <h2>{selectedBook.title}</h2>
+                <p className="modal-author">by {selectedBook.author}</p>
+                
+                {/* --- NEW DESCRIPTION SECTION --- */}
+                <div className="modal-description">
+                  <p>{selectedBook.description}</p>
+                </div>
+                
+                <div className="modal-meta">
+                  <span><strong>Category:</strong> {selectedBook.category}</span>
+                </div>
+                
+                <div className="modal-actions">
+                  <button 
+                    className="google-btn"
+                    onClick={() => window.open(`https://www.google.com/search?q=${selectedBook.title}+${selectedBook.author}`, '_blank')}
+                  >
+                    🔍 Search on Google
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -116,7 +168,8 @@ function App() {
           return {
             title: clean(cols[0]),
             author: clean(cols[1]),
-            category: clean(cols[12] || "Uncategorized"), // Index 12 for Category M
+            description: clean(cols[5] || "No description available."), 
+            category: clean(cols[12] || "Uncategorized"), 
             cover: clean(rawLink)
           };
         });

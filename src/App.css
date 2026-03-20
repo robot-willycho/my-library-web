@@ -58,7 +58,7 @@
   justify-content: space-between; /* Keeps the author at the bottom */
 }
 
-..qr-section {
+.qr-section {
   text-align: center;
   background: white;
   padding: 10px;
@@ -143,4 +143,99 @@
   padding: 20px 0;
   background-color: #f8f9fa;
   border-bottom: 1px solid #eee;
+}
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.85); /* Darken background */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+  padding: 20px;
+}
+
+.modal-content {
+  background: white;
+  width: 100%;
+  max-width: 800px;
+  border-radius: 20px;
+  position: relative;
+  overflow: hidden;
+  animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes popIn {
+  from { transform: scale(0.8); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.modal-body {
+  display: flex;
+  flex-direction: row; /* Side by side on desktop */
+  gap: 30px;
+  padding: 40px;
+}
+
+/* Mobile responsive modal */
+@media (max-width: 600px) {
+  .modal-body { flex-direction: column; padding: 20px; align-items: center; }
+  .modal-image img { width: 180px !important; }
+}
+
+.modal-image img {
+  width: 280px;
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.modal-details {
+  flex: 1;
+  text-align: left;
+}
+
+.modal-details h2 { margin-top: 0; color: #2c3e50; font-size: 1.8rem; }
+.modal-author { font-size: 1.2rem; color: #7f8c8d; margin-bottom: 20px; }
+
+.modal-actions { margin-top: 30px; }
+
+.modal-description {
+  margin: 20px 0;
+  line-height: 1.6;
+  color: #34495e;
+  font-size: 1rem;
+  max-height: 200px; /* Limits height if description is very long */
+  overflow-y: auto;  /* Adds a scrollbar if text exceeds max-height */
+  padding-right: 10px;
+}
+
+.modal-description p {
+  margin: 0;
+  font-style: italic; /* Makes the description stand out from the metadata */
+}
+
+.google-btn {
+  background: #4285F4;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.google-btn:hover { background: #357abd; }
+
+.close-button {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  font-size: 2rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #95a5a6;
 }
