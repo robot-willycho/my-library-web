@@ -5,16 +5,10 @@ import './App.css';
 // --- SHARED UTILITY ---
 const getImageUrl = (driveLink) => {
   if (!driveLink) return "";
-
-  // Extract the ID from any Google Drive link format
   const match = driveLink.match(/(?:id=|\/d\/)([\w-]+)/);
-  
   if (match && match[1]) {
-    const fileId = match[1];
-    // This 'lh3' link is the 'Web-Friendly' version that avoids CORB blocks
-    return `https://lh3.googleusercontent.com/d/${fileId}=s400`;
+    return `https://lh3.googleusercontent.com/d/${match[1]}`;
   }
-  
   return driveLink;
 };
 
