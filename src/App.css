@@ -367,3 +367,138 @@ body {
     align-self: center;
   }
 }
+
+/* ==========================================================================
+   📱 MOBILE RESPONSIVENESS OVERRIDES (ADD TO BOTTOM OF FILE)
+   ========================================================================== */
+
+@media (max-width: 768px) {
+  /* Global Layout Scaling */
+  .global-header {
+    padding: 12px 20px;
+    justify-content: center; /* Centers the header item on small viewports */
+  }
+
+  .qr-section {
+    padding: 4px 10px;
+    gap: 8px;
+  }
+  
+  .qr-section img {
+    width: 48px;
+    height: 48px;
+  }
+
+  .home-container, .library-container {
+    padding: 24px 16px;
+  }
+
+  /* Typography Scale Down */
+  .home-header {
+    padding: 40px 16px;
+    margin-bottom: 32px;
+    border-radius: 16px;
+  }
+
+  .home-header h1 {
+    font-size: 1.85rem;
+  }
+
+  .home-header p {
+    font-size: 0.95rem;
+  }
+
+  .library-header h1 {
+    font-size: 1.65rem;
+  }
+
+  /* Grid Adjustments for Compact Screens */
+  .category-grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 16px;
+  }
+
+  .category-card {
+    padding: 24px 16px;
+    border-radius: 14px;
+  }
+
+  .category-icon {
+    font-size: 2.5rem;
+    margin-bottom: 8px;
+  }
+
+  .category-card h3 {
+    font-size: 1rem;
+  }
+
+  .book-grid {
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 16px;
+  }
+  
+  .book-info h3 {
+    font-size: 0.85rem;
+  }
+}
+
+/* Specific Small Screens & Modal Safeguards */
+@media (max-width: 680px) {
+  .modal-overlay {
+    padding: 12px;
+  }
+
+  .modal-content {
+    border-radius: 20px;
+    max-height: 90vh; /* Prevents overflow completely on vertical screens */
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto; /* Activates internal scrolling for long text */
+  }
+
+  .modal-body {
+    flex-direction: column;
+    padding: 32px 20px 24px 20px;
+    align-items: center;
+    text-align: center;
+    gap: 20px;
+  }
+
+  .modal-image img {
+    width: 150px;
+    box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+  }
+
+  .modal-details {
+    align-items: center;
+    width: 100%;
+  }
+
+  .modal-details h2 {
+    font-size: 1.35rem;
+  }
+
+  .modal-author {
+    font-size: 0.95rem;
+    margin-bottom: 16px;
+  }
+
+  .modal-description {
+    font-size: 0.85rem;
+    line-height: 1.5;
+    margin-bottom: 16px;
+  }
+
+  .google-btn {
+    align-self: stretch; /* Stretches the button full width for easy thumb interaction */
+    text-align: center;
+  }
+
+  .close-button {
+    top: 12px;
+    right: 12px;
+    width: 32px;
+    height: 32px;
+    font-size: 1.25rem;
+  }
+}

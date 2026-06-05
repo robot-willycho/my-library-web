@@ -185,33 +185,43 @@ function Library() {
         </div>
       )}
 
-      {/* Pop-up Descriptive Modal */}
+      {/* Detail Popup View Modal */}
       {selectedBook && (
-        <div className="modal-overlay" onClick={() => setSelectedBook(null)} style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(15, 23, 42, 0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '20px' }}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ background: '#fff', padding: '32px', borderRadius: '16px', maxWidth: '600px', width: '100%', position: 'relative', boxShadow: '0 25px 50px -12px rgb(0 0 0 / 0.25)' }}>
-            <button onClick={() => setSelectedBook(null)} style={{ position: 'absolute', top: '16px', right: '20px', background: 'none', border: 'none', fontSize: '1.75rem', cursor: 'pointer', color: '#94a3b8' }}>×</button>
-            <div style={{ display: 'flex', gap: '24px' }}>
-              <div style={{ width: '150px', height: '220px', flexShrink: 0, background: '#f1f5f9', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+        <div className="modal-overlay" onClick={() => setSelectedBook(null)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <button className="close-button" onClick={() => setSelectedBook(null)}>×</button>
+            
+            {/* Added modal-body wrapper class here */}
+            <div className="modal-body">
+              
+              {/* Added modal-image wrapper class here */}
+              <div className="modal-image">
                 {getImageUrl(selectedBook.cover) ? (
-                  <img src={getImageUrl(selectedBook.cover)} alt={selectedBook.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  <img src={getImageUrl(selectedBook.cover)} alt={selectedBook.title} />
                 ) : (
                   <div style={{ fontSize: '3rem' }}>📚</div>
                 )}
               </div>
-              <div>
-                <h2 style={{ fontSize: '1.5rem', color: '#0f172a', margin: '0 0 6px 0' }}>{selectedBook.title}</h2>
-                <p style={{ color: '#475569', fontWeight: '500', margin: '0 0 16px 0' }}>by {selectedBook.author}</p>
-                <span style={{ display: 'inline-block', background: '#f1f5f9', padding: '4px 10px', borderRadius: '4px', fontSize: '0.8rem', color: '#64748b', fontWeight: '600', marginBottom: '16px' }}>
-                  Dewey Classification: {selectedBook.subCategory}
-                </span>
-                <p style={{ color: '#64748b', fontSize: '0.95rem', lineHeight: '1.5', margin: '0 0 20px 0', maxHeight: '120px', overflowY: 'auto' }}>{selectedBook.description}</p>
+
+              {/* Added modal-details class here */}
+              <div className="modal-details">
+                <h2>{selectedBook.title}</h2>
+                <p className="modal-author">by {selectedBook.author}</p>
+                
+                <div className="modal-meta">
+                  <span>Dewey Classification: {selectedBook.subCategory}</span>
+                </div>
+                
+                <p className="modal-description">{selectedBook.description}</p>
+                
                 <button 
+                  className="google-btn"
                   onClick={() => window.open(`https://www.google.com/search?q=${encodeURIComponent(selectedBook.title + ' ' + selectedBook.author)}`, '_blank')}
-                  style={{ padding: '10px 16px', background: '#2563eb', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: '500' }}
                 >
                   Search on Google
                 </button>
               </div>
+
             </div>
           </div>
         </div>
