@@ -55,22 +55,37 @@
   margin-bottom: 16px;
 }
 
+/* --- REFINED BADGE COLOR SCHEMES --- */
+
+/* Base Badge Configuration */
 .project-type-badge {
-  padding: 4px 10px;
-  border-radius: 20px;
+  padding: 6px 12px;
+  border-radius: 50px;       /* Sleeker, fully pill-shaped design */
   font-size: 0.75rem;
-  font-weight: 600;
+  font-weight: 700;          /* Bolder text for clear scanning */
   text-transform: uppercase;
+  letter-spacing: 0.05em;    /* Slight letter-spacing for premium feel */
 }
 
+/* 📊 Scheme 1: Data & Analysis (Subtle Emerald/Teal Mint Theme) */
 .badge-data {
-  background-color: #e0f2fe;
-  color: #0369a1;
+  background-color: #ecfdf5; /* Soft Mint Background */
+  color: #047857;            /* Deep Emerald Text */
+  border: 1px solid rgba(4, 120, 87, 0.1);
 }
 
+/* 🤖 Scheme 2: AI Application (Modern Indigo/Electric Purple Theme) */
 .badge-ai {
-  background-color: #f3e8ff;
-  color: #6b21a8;
+  background-color: #e0e7ff; /* Soft Lavender/Indigo Background */
+  color: #4338ca;            /* Sharp Electric Indigo Text */
+  border: 1px solid rgba(67, 56, 202, 0.1);
+}
+
+/* 🌐 Scheme 3: Web App / Miscellaneous (Warm Amber/Orange Theme) */
+.badge-web {
+  background-color: #fef3c7; 
+  color: #d97706;
+  border: 1px solid rgba(217, 119, 6, 0.1);
 }
 
 .project-id {
