@@ -14,18 +14,7 @@ const PROJECTS = [
     techStack: ["RStudio", "R Markdown", "ggplot2", "dplyr", "Predictive Modeling"]
   },
   {
-    id: "ai-prototype-02",
-    type: "AI Application",
-    title: "Intelligent Customer Support Routing Agent",
-    description: "An AI agent prototype designed in Google AI Studio to classify user intent and generate context-aware replies. Includes full prompt engineering specifications, temperature calibrations, and multi-turn system instructions.",
-    links: { 
-      liveApp: "#", // Can link to a live wrapper later if you connect the Gemini API SDK
-      promptSpecs: "https://github.com/yourusername/ai-routing-agent" // Link to a markdown file showing your prompt logic
-    },
-    techStack: ["Google AI Studio", "Prompt Engineering", "Gemini Pro", "System Instructions"]
-  },
-  {
-    id: "excel-automation-03",
+    id: "excel-automation-02",
     type: "Data & Analysis",
     title: "Financial Dashboard & Portfolio Tracking Pipeline",
     description: "Advanced macro-enabled Excel sheet designed to track investment allocations. Features automated pivot tables, dynamic charts, and automated cleaning structures for raw CSV data extracts.",
@@ -34,6 +23,28 @@ const PROJECTS = [
       code: "https://github.com/yourusername/excel-finance-pipeline"
     },
     techStack: ["Excel", "VBA Macros", "Data Warehousing", "Financial Analytics"]
+  },
+  {
+    id: "library-manager-ai-03",
+    type: "AI Application",
+    title: "Personal Library Manager Data Pipeline",
+    description: "An operational data integration engine engineered in Google AI Studio. It automates library cataloging by parsing raw book parameters, auto-mapping Dewey Decimal classifications, and streaming records in real-time to a connected Google Spreadsheet and Google Drive storage ecosystem.",
+    links: { 
+      liveApp: "/library", // Routes directly to your own live website Library tab!
+      code: "https://github.com/robot-willycho/my-library-web" 
+    },
+    techStack: ["Google AI Studio", "Google Sheets API", "React.js", "Data Pipelines"]
+  },
+  {
+    id: "playbox-hub-ai-04",
+    type: "AI Application",
+    title: "Playbox Hub: AI Mini-Game Suite",
+    description: "An interactive gaming dashboard featuring classic modules like Tic-Tac-Toe (engineered with a minimax state algorithm) and Retro Snake. Developed as an AI prototyping sandbox to evaluate real-time component rendering and state updates via prompt-driven UI structures.",
+    links: { 
+      liveApp: "#", // We can add a custom modal or markdown code block popup later
+      code: "https://github.com/robot-willycho/my-library-web" 
+    },
+    techStack: ["Google AI Studio", "React Hooks", "Web Audio API", "State Architecture"]
   }
 ];
 
